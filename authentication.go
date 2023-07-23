@@ -193,10 +193,10 @@ func (authenticationProtocol *AuthenticationProtocol) handleLogin(packet nex.Pac
 	}
 	log.Println("Username : ", username)
 
-	//if err != nil {
-	//	go authenticationProtocol.LoginHandler(err, client, callID, "")
-	//	return
-	//}
+	if err != nil {
+		go authenticationProtocol.LoginHandler(err, client, callID, "")
+		return
+	}
 
 	go authenticationProtocol.LoginHandler(nil, client, callID, username)
 }
