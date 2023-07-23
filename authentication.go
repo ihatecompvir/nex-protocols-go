@@ -33,7 +33,7 @@ const (
 // AuthenticationProtocol handles the Authentication nex protocol
 type AuthenticationProtocol struct {
 	server                *nex.Server
-	LoginHandler          func(err error, client *nex.Client, callID uint32, username string)
+	LoginHandler          func(err error, client *nex.Client, callID uint32, username string, pop string)
 	LoginExHandler        func(err error, client *nex.Client, callID uint32, username string, authenticationInfo *AuthenticationInfo)
 	RequestTicketHandler  func(err error, client *nex.Client, callID uint32, userPID uint32, serverPID uint32)
 	GetPIDHandler         func(err error, client *nex.Client, callID uint32, username string)
@@ -179,7 +179,9 @@ func (authenticationProtocol *AuthenticationProtocol) handleLogin(packet nex.Pac
         log.Println("3 : ", callID)
         log.Println("4 : ", parameters)
 
-        //parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
+        parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
+
+	pop, err := parametersStream.Read4ByteString()
 
 	username := ""
 	x := 2
