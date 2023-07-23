@@ -1,7 +1,7 @@
 package nexproto
 
 import (
-	nex "github.com/ihatecompvir/nex-go"
+	nex "github.com/knvtva/nex-go"
 )
 
 // StreamIn is an abstraction of StreamIn from github.com/ihatecompvir/nex-go
