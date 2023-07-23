@@ -183,6 +183,9 @@ func (authenticationProtocol *AuthenticationProtocol) handleLogin(packet nex.Pac
 
 	pop, err := parametersStream.Read4ByteString()
 
+	log.Println(pop)
+	log.Println(err)
+
 	username := ""
 	x := 2
 	for parameters [x] != 0 {
