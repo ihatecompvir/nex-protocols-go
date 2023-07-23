@@ -179,24 +179,12 @@ func (authenticationProtocol *AuthenticationProtocol) handleLogin(packet nex.Pac
         log.Println("3 : ", callID)
         log.Println("4 : ", parameters)
 
-        parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
-
-	pop, err := parametersStream.Read4ByteString()
-
-	log.Println(pop)
-	log.Println(err)
-
 	username := ""
 	x := 2
 	for parameters [x] != 0 {
  		username += string(parameters[x])
 	}
 	log.Println("Username : ", username)
-
-	if err != nil {
-		go authenticationProtocol.LoginHandler(err, client, callID, "")
-		return
-	}
 
 	go authenticationProtocol.LoginHandler(nil, client, callID, username)
 }
