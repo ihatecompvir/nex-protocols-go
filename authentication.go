@@ -170,6 +170,11 @@ func (authenticationProtocol *AuthenticationProtocol) handleLogin(packet nex.Pac
 	client := packet.Sender()
 	request := packet.RMCRequest()
 
+	log.Println("1 : ", client)
+	log.Println("2 : ", request)
+	log.Println("3 : ", callID)
+	log.Println("4 : ", parameters)
+
 	callID := request.CallID()
 	parameters := request.Parameters()
 
