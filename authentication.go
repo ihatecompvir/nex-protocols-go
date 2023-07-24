@@ -4,7 +4,7 @@ import (
 	"errors"
 	"log"
 
-	nex "github.com/knvtva/nex-go"
+	nex "github.com/ihatecompvir/nex-go"
 )
 
 const (
@@ -170,21 +170,26 @@ func (authenticationProtocol *AuthenticationProtocol) handleLogin(packet nex.Pac
 	client := packet.Sender()
 	request := packet.RMCRequest()
 
-	log.Println("1 : ", client)
-	log.Println("2 : ", request)
+	callID := request.CallID()
+	parameters := request.Parameters()
 
-        callID := request.CallID()
-        parameters := request.Parameters()
+	parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
 
-        log.Println("3 : ", callID)
-        log.Println("4 : ", parameters)
+	pop, err := parametersStream.Read4ByteString()
 
 	username := ""
 	x := 2
-	for parameters [x] != 0 {
- 		username += string(parameters[x])
+	for parameters[x] != 0 {
+		username += string(parameters[x])
+		x += 1
 	}
 	log.Println("Username : ", username)
+	log.Println(pop)
+
+	if err != nil {
+		go authenticationProtocol.LoginHandler(err, client, callID, "")
+		return
+	}
 
 	go authenticationProtocol.LoginHandler(nil, client, callID, username)
 }
