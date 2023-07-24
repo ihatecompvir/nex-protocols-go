@@ -175,38 +175,23 @@ func (authenticationProtocol *AuthenticationProtocol) handleLogin(packet nex.Pac
 
 	parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
 
-	username, err := parametersStream.ReadString()
+	pop, err := parametersStream.Read4ByteString()
 
-	if username == "" {
-		// Debugging statements
-		log.Println("Raw parameters: %v\n", parameters)
-		log.Println("Raw username: %v\n", username)
-
-		// Implement the GetRB2Username functionality directly here
-		username = getRB2Username(parameters)
-		log.Println("Extracted username: %v\n", username)
-
-		client.Username = username
-	}
-
-	if err != nil {
-		go authenticationProtocol.LoginExHandler(err, client, callID, "", nil)
-		return
-	}
-
-	go authenticationProtocol.LoginHandler(nil, client, callID, username)
-}
-
-func getRB2Username(parameters []byte) string {
 	username := ""
 	x := 2
 	for parameters[x] != 0 {
 		username += string(parameters[x])
 		x += 1
 	}
-	log.Println(parameters)
 	log.Println("Username : ", username)
-	return username
+	log.Println(pop)
+
+	if err != nil {
+		go authenticationProtocol.LoginHandler(err, client, callID, username)
+		return
+	}
+
+	go authenticationProtocol.LoginHandler(nil, client, callID, username)
 }
 
 func (authenticationProtocol *AuthenticationProtocol) handleLoginEx(packet nex.PacketInterface) {
@@ -224,10 +209,19 @@ func (authenticationProtocol *AuthenticationProtocol) handleLoginEx(packet nex.P
 
 	parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
 
-	username, err := parametersStream.ReadString()
+	pop, err := parametersStream.Read4ByteString()
+
+	username := ""
+	x := 2
+	for parameters[x] != 0 {
+		username += string(parameters[x])
+		x += 1
+	}
+	log.Println("Username : ", username)
+	log.Println(pop)
 
 	if err != nil {
-		go authenticationProtocol.LoginExHandler(err, client, callID, "", nil)
+		go authenticationProtocol.LoginExHandler(err, client, callID, "", username)
 		return
 	}
 
@@ -306,7 +300,16 @@ func (authenticationProtocol *AuthenticationProtocol) handleGetPID(packet nex.Pa
 
 	parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
 
-	username, err := parametersStream.ReadString()
+	pop, err := parametersStream.Read4ByteString()
+
+	username := ""
+	x := 2
+	for parameters[x] != 0 {
+		username += string(parameters[x])
+		x += 1
+	}
+	log.Println("Username : ", username)
+	log.Println(pop)
 
 	if err != nil {
 		go authenticationProtocol.GetPIDHandler(err, client, callID, "")
