@@ -196,9 +196,9 @@ func getRB2Username(parameters []byte) string {
 	x := 2
 	for parameters[x] != 0 {
 		username += string(parameters[x])
-		log.Println(parameters[x])
 		x += 1
 	}
+	log.Println(parameters)
 	log.Println("Username : ", username)
 	return username
 }
