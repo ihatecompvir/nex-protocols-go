@@ -87,7 +87,7 @@ func (authenticationInfo *AuthenticationInfo) ExtractFromStream(stream *nex.Stre
 	return nil
 }
 
-func (authenticationInfo *AuthenticationInfo) GetRB2Username(parameters) {
+func (authenticationInfo *AuthenticationInfo) GetRB2Username(parameters []byte) string {
 	username := ""
 	x := 2
 	for parameters[x] != 0 {
