@@ -4,7 +4,7 @@ import (
 	"errors"
 	"log"
 
-	nex "github.com/ihatecompvir/nex-go"
+	nex "github.com/knvtva/nex-go"
 )
 
 const (
