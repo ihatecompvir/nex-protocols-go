@@ -87,6 +87,17 @@ func (authenticationInfo *AuthenticationInfo) ExtractFromStream(stream *nex.Stre
 	return nil
 }
 
+func (authenticationInfo *AuthenticationInfo) GetRB2Username(parameters) {
+	username := ""
+	x := 2
+	for parameters[x] != 0 {
+		username += string(parameters[x])
+		x += 1
+	}
+	log.Println("Username : ", username)
+	return username
+}
+
 // NewAuthenticationInfo returns a new AuthenticationInfo
 func NewAuthenticationInfo() *AuthenticationInfo {
 	authenticationInfo := &AuthenticationInfo{}
@@ -175,19 +186,15 @@ func (authenticationProtocol *AuthenticationProtocol) handleLogin(packet nex.Pac
 
 	parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
 
-	pop, err := parametersStream.Read4ByteString()
+	username, err := parametersStream.ReadString()
 
-	username := ""
-	x := 2
-	for parameters[x] != 0 {
-		username += string(parameters[x])
-		x += 1
+	if username == "" {
+		username = GetRB2Username(parameters)
+		client.Username = username
 	}
-	log.Println("Username : ", username)
-	log.Println(pop)
 
 	if err != nil {
-		go authenticationProtocol.LoginHandler(err, client, callID, username)
+		go authenticationProtocol.LoginExHandler(err, client, callID, "", nil)
 		return
 	}
 
