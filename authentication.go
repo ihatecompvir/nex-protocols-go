@@ -221,7 +221,7 @@ func (authenticationProtocol *AuthenticationProtocol) handleLoginEx(packet nex.P
 	log.Println(pop)
 
 	if err != nil {
-		go authenticationProtocol.LoginExHandler(err, client, callID, "", username)
+		go authenticationProtocol.LoginExHandler(err, client, callID, "", "")
 		return
 	}
 
