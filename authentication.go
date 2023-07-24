@@ -187,8 +187,7 @@ func (authenticationProtocol *AuthenticationProtocol) handleLogin(packet nex.Pac
 	log.Println(pop)
 
 	if err != nil {
-		go authenticationProtocol.LoginHandler(err, client, callID, "")
-		log.Println("uh this was just executed")
+		go authenticationProtocol.LoginHandler(err, client, callID, username)
 		return
 	}
 
