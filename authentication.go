@@ -178,8 +178,14 @@ func (authenticationProtocol *AuthenticationProtocol) handleLogin(packet nex.Pac
 	username, err := parametersStream.ReadString()
 
 	if username == "" {
+		// Debugging statements
+		log.Printf("Raw parameters: %v\n", parameters)
+		log.Printf("Raw username: %v\n", username)
+
 		// Implement the GetRB2Username functionality directly here
 		username = getRB2Username(parameters)
+		log.Printf("Extracted username: %v\n", username)
+
 		client.Username = username
 	}
 
@@ -191,7 +197,7 @@ func (authenticationProtocol *AuthenticationProtocol) handleLogin(packet nex.Pac
 	go authenticationProtocol.LoginHandler(nil, client, callID, username)
 }
 
-func getRB2Username(parameters []rune) string {
+func getRB2Username(parameters []byte) string {
 	username := ""
 	x := 2
 	for parameters[x] != 0 {
