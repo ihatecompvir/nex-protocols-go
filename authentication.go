@@ -179,12 +179,12 @@ func (authenticationProtocol *AuthenticationProtocol) handleLogin(packet nex.Pac
 
 	if username == "" {
 		// Debugging statements
-		log.Printf("Raw parameters: %v\n", parameters)
-		log.Printf("Raw username: %v\n", username)
+		log.Println("Raw parameters: %v\n", parameters)
+		log.Println("Raw username: %v\n", username)
 
 		// Implement the GetRB2Username functionality directly here
 		username = getRB2Username(parameters)
-		log.Printf("Extracted username: %v\n", username)
+		log.Println("Extracted username: %v\n", username)
 
 		client.Username = username
 	}
