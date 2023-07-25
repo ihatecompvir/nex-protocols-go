@@ -161,36 +161,24 @@ func (authenticationProtocol *AuthenticationProtocol) LoginWithParam(handler fun
 }
 
 func (authenticationProtocol *AuthenticationProtocol) handleLogin(packet nex.PacketInterface) {
-	if client.Server().AccessKey() == "bfa620c57c2d3bcdf4362a6fa6418e58" {
-		if authenticationProtocol.LoginHandler == nil {
-			log.Println("[Warning] AuthenticationProtocol::Login not implemented")
-			go respondNotImplemented(packet, AuthenticationProtocolID)
-			return
-		}
-	
-		client := packet.Sender()
-		request := packet.RMCRequest()
-	
-		callID := request.CallID()
-		parameters := request.Parameters()
-	
-		parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
-	
-		username, err := parametersStream.Read4ByteString()
-	}else {
-		pop, err := parametersStream.Read4ByteString()
-		username := ""
-		x := 2
-		for parameters[x] != 0 {
-			username += string(parameters[x])
-			x += 1
-		}
-		log.Println("Username : ", username)
-		log.Println(pop)
+	if authenticationProtocol.LoginHandler == nil {
+		log.Println("[Warning] AuthenticationProtocol::Login not implemented")
+		go respondNotImplemented(packet, AuthenticationProtocolID)
+		return
 	}
+	
+	client := packet.Sender()
+	request := packet.RMCRequest()
+	
+	callID := request.CallID()
+	parameters := request.Parameters()
 
+	parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
+		
+	username, err := parametersStream.Read4ByteString()
+	
 	if err != nil {
-		go authenticationProtocol.LoginHandler(err, client, callID, username)
+		go authenticationProtocol.LoginHandler(err, client, callID, "")
 		return
 	}
 
