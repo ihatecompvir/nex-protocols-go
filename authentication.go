@@ -161,21 +161,21 @@ func (authenticationProtocol *AuthenticationProtocol) LoginWithParam(handler fun
 }
 
 func (authenticationProtocol *AuthenticationProtocol) handleLogin(packet nex.PacketInterface) {
-	if authenticationProtocol.LoginHandler == nil {
-		log.Println("[Warning] AuthenticationProtocol::Login not implemented")
-		go respondNotImplemented(packet, AuthenticationProtocolID)
-		return
-	}
-
-	client := packet.Sender()
-	request := packet.RMCRequest()
-
-	callID := request.CallID()
-	parameters := request.Parameters()
-
-	parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
-
-	if nex.client.Server().AccessKey() == "bfa620c57c2d3bcdf4362a6fa6418e58" {
+	if client.Server().AccessKey() == "bfa620c57c2d3bcdf4362a6fa6418e58" {
+		if authenticationProtocol.LoginHandler == nil {
+			log.Println("[Warning] AuthenticationProtocol::Login not implemented")
+			go respondNotImplemented(packet, AuthenticationProtocolID)
+			return
+		}
+	
+		client := packet.Sender()
+		request := packet.RMCRequest()
+	
+		callID := request.CallID()
+		parameters := request.Parameters()
+	
+		parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
+	
 		username, err := parametersStream.Read4ByteString()
 	}else {
 		pop, err := parametersStream.Read4ByteString()
