@@ -131,6 +131,8 @@ func (matchmakingProtocol *MatchmakingProtocol) handleUpdateGathering(packet nex
 
 	parametersStream := NewStreamIn(parameters, matchmakingProtocol.server)
 
+	log.Println(parameters)
+	
 	parametersStream.Read4ByteString()
 	parametersStream.ReadUInt32LE()
 	gathering, err := parametersStream.ReadBuffer()
