@@ -103,6 +103,8 @@ func (matchmakingProtocol *MatchmakingProtocol) handleRegisterGathering(packet n
 
 	parametersStream := NewStreamIn(parameters, matchmakingProtocol.server)
 
+	log.Println(parameters)
+
 	parametersStream.Read4ByteString()
 	parametersStream.ReadUInt32LE()
 	gathering, err := parametersStream.ReadBuffer()
