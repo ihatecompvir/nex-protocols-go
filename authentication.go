@@ -199,17 +199,8 @@ func (authenticationProtocol *AuthenticationProtocol) handleLoginEx(packet nex.P
 	parameters := request.Parameters()
 
 	parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
-
-	pop, err := parametersStream.Read4ByteString()
-
-	username := ""
-	x := 2
-	for parameters[x] != 0 {
-		username += string(parameters[x])
-		x += 1
-	}
-	log.Println("Username : ", username)
-	log.Println(pop)
+		
+	username, err := parametersStream.Read4ByteString()
 
 	if err != nil {
 		go authenticationProtocol.LoginExHandler(err, client, callID, "", nil)
@@ -291,16 +282,9 @@ func (authenticationProtocol *AuthenticationProtocol) handleGetPID(packet nex.Pa
 
 	parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
 
-	pop, err := parametersStream.Read4ByteString()
-
-	username := ""
-	x := 2
-	for parameters[x] != 0 {
-		username += string(parameters[x])
-		x += 1
-	}
-	log.Println("Username : ", username)
-	log.Println(pop)
+	parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
+		
+	username, err := parametersStream.Read4ByteString()
 
 	if err != nil {
 		go authenticationProtocol.GetPIDHandler(err, client, callID, "")
