@@ -281,9 +281,7 @@ func (authenticationProtocol *AuthenticationProtocol) handleGetPID(packet nex.Pa
 	parameters := request.Parameters()
 
 	parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
-
-	parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
-		
+	
 	username, err := parametersStream.Read4ByteString()
 
 	if err != nil {
