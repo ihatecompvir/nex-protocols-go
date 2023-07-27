@@ -116,6 +116,8 @@ func (matchmakingProtocol *MatchmakingProtocol) handleRegisterGathering(packet n
 	}
 
 	go matchmakingProtocol.RegisterGatheringHandler(nil, client, callID, gathering)
+
+	log.Println("[Nex:Proto : Registered Gathering]")
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) handleUpdateGathering(packet nex.PacketInterface) {
@@ -150,6 +152,8 @@ func (matchmakingProtocol *MatchmakingProtocol) handleUpdateGathering(packet nex
 	}
 
 	go matchmakingProtocol.UpdateGatheringHandler(nil, client, callID, gathering, gatheringID)
+
+	log.Println("[Nex:Proto : Updated Gathering]")
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) handleParticipate(packet nex.PacketInterface) {
@@ -170,6 +174,8 @@ func (matchmakingProtocol *MatchmakingProtocol) handleParticipate(packet nex.Pac
 	gatheringID := parametersStream.ReadUInt32LE()
 
 	go matchmakingProtocol.ParticipateHandler(nil, client, callID, gatheringID)
+	
+	log.Println("[Nex:Proto : Participate Gathering]")
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) handleUnparticipate(packet nex.PacketInterface) {
@@ -190,6 +196,8 @@ func (matchmakingProtocol *MatchmakingProtocol) handleUnparticipate(packet nex.P
 	gatheringID := parametersStream.ReadUInt32LE()
 
 	go matchmakingProtocol.UnparticipateHandler(nil, client, callID, gatheringID)
+
+	log.Println("[Nex:Proto : Unparticipate Gathering]")
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) handleLaunchSession(packet nex.PacketInterface) {
@@ -210,6 +218,8 @@ func (matchmakingProtocol *MatchmakingProtocol) handleLaunchSession(packet nex.P
 	gatheringID := parametersStream.ReadUInt32LE()
 
 	go matchmakingProtocol.LaunchSessionHandler(nil, client, callID, gatheringID)
+
+	log.Println("[Nex:Proto : Launching Session Gathering]")
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) handleTerminateGathering(packet nex.PacketInterface) {
@@ -230,6 +240,8 @@ func (matchmakingProtocol *MatchmakingProtocol) handleTerminateGathering(packet 
 	gatheringID := parametersStream.ReadUInt32LE()
 
 	go matchmakingProtocol.TerminateGatheringHandler(nil, client, callID, gatheringID)
+
+	log.Println("[Nex:Proto : Terminated Gathering]")
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) handleSetState(packet nex.PacketInterface) {
@@ -251,6 +263,8 @@ func (matchmakingProtocol *MatchmakingProtocol) handleSetState(packet nex.Packet
 	state := parametersStream.ReadUInt32LE()
 
 	go matchmakingProtocol.SetStateHandler(nil, client, callID, gatheringID, state)
+
+	log.Println("[Nex:Proto : SetState Gathering]")
 }
 
 // NewSecureProtocol returns a new SecureProtocol
