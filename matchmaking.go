@@ -105,7 +105,7 @@ func (matchmakingProtocol *MatchmakingProtocol) handleRegisterGathering(packet n
 
 	log.Println(parameters)
 
-	parametersStream.Read4ByteString()
+	parametersStream.ReadString()
 	parametersStream.ReadUInt8()
 	gathering, err := parametersStream.ReadBuffer()
 
