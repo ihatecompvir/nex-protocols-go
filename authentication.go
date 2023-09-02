@@ -254,8 +254,6 @@ func (authenticationProtocol *AuthenticationProtocol) handleRequestTicket(packet
 	callID := request.CallID()
 	parameters := request.Parameters()
 
-	log.Println(parameters)
-
 	if len(parameters) != 8 {
 		err := errors.New("[AuthenticationProtocol::RequestTicket] Parameters length not 8")
 		go authenticationProtocol.RequestTicketHandler(err, client, callID, 0, 0)
