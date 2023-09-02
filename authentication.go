@@ -176,7 +176,6 @@ func (authenticationProtocol *AuthenticationProtocol) handleLogin(packet nex.Pac
 	parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
 		
 	username, err := parametersStream.Read4ByteString()
-	log.Println("[Nex-Proto:Debug]", authenticationInfo.Token)
 	
 	if err != nil {
 		go authenticationProtocol.LoginHandler(err, client, callID, "")
@@ -254,6 +253,8 @@ func (authenticationProtocol *AuthenticationProtocol) handleRequestTicket(packet
 
 	callID := request.CallID()
 	parameters := request.Parameters()
+
+	log.Println(parameters)
 
 	if len(parameters) != 8 {
 		err := errors.New("[AuthenticationProtocol::RequestTicket] Parameters length not 8")
