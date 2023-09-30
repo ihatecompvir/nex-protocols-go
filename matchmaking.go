@@ -103,8 +103,6 @@ func (matchmakingProtocol *MatchmakingProtocol) handleRegisterGathering(packet n
 
 	parametersStream := NewStreamIn(parameters, matchmakingProtocol.server)
 
-	log.Println(parameters)
-
 	parametersStream.Read4ByteString()
 	parametersStream.ReadUInt32LE()
 	gathering, err := parametersStream.ReadBuffer()
@@ -116,8 +114,6 @@ func (matchmakingProtocol *MatchmakingProtocol) handleRegisterGathering(packet n
 	}
 
 	go matchmakingProtocol.RegisterGatheringHandler(nil, client, callID, gathering)
-
-	log.Println("[Nex:Proto : Registered Gathering]")
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) handleUpdateGathering(packet nex.PacketInterface) {
@@ -134,8 +130,6 @@ func (matchmakingProtocol *MatchmakingProtocol) handleUpdateGathering(packet nex
 	parameters := request.Parameters()
 
 	parametersStream := NewStreamIn(parameters, matchmakingProtocol.server)
-
-	log.Println(parameters)
 	
 	parametersStream.Read4ByteString()
 	parametersStream.ReadUInt32LE()
@@ -152,8 +146,6 @@ func (matchmakingProtocol *MatchmakingProtocol) handleUpdateGathering(packet nex
 	}
 
 	go matchmakingProtocol.UpdateGatheringHandler(nil, client, callID, gathering, gatheringID)
-
-	log.Println("[Nex:Proto : Updated Gathering]")
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) handleParticipate(packet nex.PacketInterface) {
@@ -175,7 +167,6 @@ func (matchmakingProtocol *MatchmakingProtocol) handleParticipate(packet nex.Pac
 
 	go matchmakingProtocol.ParticipateHandler(nil, client, callID, gatheringID)
 	
-	log.Println("[Nex:Proto : Participate Gathering]")
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) handleUnparticipate(packet nex.PacketInterface) {
