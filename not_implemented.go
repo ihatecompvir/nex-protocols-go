@@ -1,6 +1,6 @@
 package nexproto
 
-import nex "github.com/knvtva/nex-go"
+import nex "github.com/ihatecompvir/nex-go"
 
 func respondNotImplemented(packet nex.PacketInterface, protocolID uint8) {
 	client := packet.Sender()
