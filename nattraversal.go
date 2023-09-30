@@ -30,7 +30,6 @@ func (natTraversalProtocol *NATTraversalProtocol) Setup() {
 			switch request.MethodID() {
 			case RegisterGathering:
 				go natTraversalProtocol.handleRequestProbeInitiation(packet)
-				log.Println(packet)
 			default:
 				log.Printf("Unsupported NAT traversal method ID: %#v\n", request.MethodID())
 			}
