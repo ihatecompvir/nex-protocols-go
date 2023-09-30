@@ -166,17 +166,17 @@ func (authenticationProtocol *AuthenticationProtocol) handleLogin(packet nex.Pac
 		go respondNotImplemented(packet, AuthenticationProtocolID)
 		return
 	}
-
+	
 	client := packet.Sender()
 	request := packet.RMCRequest()
-
+	
 	callID := request.CallID()
 	parameters := request.Parameters()
 
 	parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
-
+		
 	username, err := parametersStream.Read4ByteString()
-
+	
 	if err != nil {
 		go authenticationProtocol.LoginHandler(err, client, callID, "")
 		return
@@ -199,7 +199,7 @@ func (authenticationProtocol *AuthenticationProtocol) handleLoginEx(packet nex.P
 	parameters := request.Parameters()
 
 	parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
-
+		
 	username, err := parametersStream.ReadString()
 
 	if err != nil {
@@ -281,7 +281,7 @@ func (authenticationProtocol *AuthenticationProtocol) handleGetPID(packet nex.Pa
 	parameters := request.Parameters()
 
 	parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
-
+	
 	username, err := parametersStream.ReadString()
 
 	if err != nil {

@@ -1,7 +1,6 @@
 package nexproto
 
 import (
-	"errors"
 	"log"
 
 	nex "github.com/ihatecompvir/nex-go"
@@ -86,18 +85,6 @@ func (accountManagementProtocol *AccountManagementProtocol) handleNintendoCreate
 		return
 	}
 
-	dataHolderName, err := parametersStream.Read4ByteString()
-	if err != nil {
-		go accountManagementProtocol.NintendoCreateAccountHandler(err, client, callID, "", "", 0, "")
-		return
-	}
-
-	if dataHolderName != "NintendoToken" {
-		err := errors.New("[AccountManagementProtocol::NintendoCreateAccount] Data holder name does not match")
-		go accountManagementProtocol.NintendoCreateAccountHandler(err, client, callID, "", "", 0, "")
-		return
-	}
-
 	go accountManagementProtocol.NintendoCreateAccountHandler(nil, client, callID, username, key, groups, email)
 }
 
@@ -133,3 +120,5 @@ func NewAccountManagementProtocol(server *nex.Server) *AccountManagementProtocol
 
 	return accountManagementProtocol
 }
+
+// TEST COMMENT
