@@ -43,12 +43,12 @@ func (rbBinaryDataProtocol *RBBinaryDataProtocol) Setup() {
 }
 
 // SaveBinaryData sets the SaveBinaryData handler function
-func (rbBinaryDataProtocol *RBBinaryDataProtocol) SaveBinaryData(handler func(err error, client *nex.Client, callID uint32, dataID uint32)) {
+func (rbBinaryDataProtocol *RBBinaryDataProtocol) SaveBinaryData(handler func(err error, client *nex.Client, callID uint32, metadata string, blob []byte)) {
 	rbBinaryDataProtocol.SaveBinaryDataHandler = handler
 }
 
 // GetBinaryData sets the GetBinaryData handler function
-func (rbBinaryDataProtocol *RBBinaryDataProtocol) GetBinaryData(handler func(err error, client *nex.Client, callID uint32, dataID uint32)) {
+func (rbBinaryDataProtocol *RBBinaryDataProtocol) GetBinaryData(handler func(err error, client *nex.Client, callID uint32, metadata string)) {
 	rbBinaryDataProtocol.GetBinaryDataHandler = handler
 }
 
