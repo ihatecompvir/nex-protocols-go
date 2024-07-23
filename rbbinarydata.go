@@ -67,7 +67,7 @@ func (rbBinaryDataProtocol *RBBinaryDataProtocol) handleSaveBinaryData(packet ne
 
 	parametersStream := NewStreamIn(parameters, rbBinaryDataProtocol.server)
 
-	metadata, err := parametersStream.ReadString()
+	metadata, err := parametersStream.Read4ByteString()
 	if err != nil {
 		go rbBinaryDataProtocol.SaveBinaryDataHandler(err, client, callID, "", nil)
 		return
@@ -97,7 +97,7 @@ func (rbBinaryDataProtocol *RBBinaryDataProtocol) handleGetBinaryData(packet nex
 
 	parametersStream := NewStreamIn(parameters, rbBinaryDataProtocol.server)
 
-	metadata, err := parametersStream.ReadString()
+	metadata, err := parametersStream.Read4ByteString()
 	if err != nil {
 		go rbBinaryDataProtocol.GetBinaryDataHandler(err, client, callID, "")
 		return
