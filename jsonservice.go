@@ -114,7 +114,7 @@ func (jsonProtocol *JsonProtocol) handleRequest2(packet nex.PacketInterface) {
 	go jsonProtocol.JSONRequest2Handler(nil, client, callID, rawJson)
 }
 
-// NewSecureProtocol returns a new SecureProtocol
+// NewJsonProtocol returns a new JsonProtocol
 func NewJsonProtocol(server *nex.Server) *JsonProtocol {
 	jsonProtocol := &JsonProtocol{
 		server:              server,

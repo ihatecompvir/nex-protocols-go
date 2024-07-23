@@ -16,7 +16,7 @@ const (
 	Unparticipate      = 0xC  // unsure on this one, going off NintendoClients wiki for the name
 	LaunchSession      = 0x1A // unsure on this one, going off NintendoClients wiki for the name
 	SetState           = 0x1E // sets the state of a gathering
-	Invite		   = 0x15 // Accept invite
+	Invite             = 0x15 // Accept invite
 )
 
 // JsonProtocol handles the Json requests
@@ -278,7 +278,7 @@ func (matchmakingProtocol *MatchmakingProtocol) handleInvite(packet nex.PacketIn
 	go matchmakingProtocol.InviteHandler(nil, client, callID, gatheringID)
 }
 
-// NewSecureProtocol returns a new SecureProtocol
+// NewMatchmakingProtocol returns a new MatchmakingProtocol
 func NewMatchmakingProtocol(server *nex.Server) *MatchmakingProtocol {
 	matchmakingProtocol := &MatchmakingProtocol{
 		server:              server,

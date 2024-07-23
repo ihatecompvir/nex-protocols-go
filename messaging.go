@@ -62,7 +62,7 @@ func (messagingProtocol *MessagingProtocol) handleGetMessageHeaders(packet nex.P
 	go messagingProtocol.GetMessageHeadersHandler(nil, client, callID, pid, recipientType, rangeOffset, rangeSize)
 }
 
-// NewSecureProtocol returns a new SecureProtocol
+// NewMessagingProtocol returns a new MessagingProtocol
 func NewMessagingProtocol(server *nex.Server) *MessagingProtocol {
 	messagingProtocol := &MessagingProtocol{
 		server:              server,

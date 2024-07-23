@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	NATTraversalProtocolID = 0x3 // the first matchmaking service protocol
+	NATTraversalProtocolID = 0x3
 
 	RequestProbeInitiation = 0x1
 	InitiateProbe          = 0x2
