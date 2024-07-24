@@ -12,7 +12,7 @@ const (
 	AccountManagementProtocolID = 0x19
 
 	SetStatus             = 0x11
-	NintendoCreateAccount = 0x1B
+	NintendoCreateAccount = 0x1B // also used by Xbox 360 when multiple profiles are signed in
 )
 
 // AccountManagementProtocol handles the Account Management nex protocol

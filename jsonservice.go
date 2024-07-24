@@ -12,7 +12,7 @@ const (
 	JsonProtocolID = 0x75
 
 	JsonRequest  = 0x1
-	JsonRequest2 = 0x2 // ?
+	JsonRequest2 = 0x2 // used for telemetry and other things that are not crucial to the game functioning
 )
 
 // JsonProtocol handles the Json requests

@@ -9,28 +9,28 @@ import (
 const (
 	MatchmakingProtocolID = 0x15 // the first matchmaking service protocol
 
-	RegisterGathering  = 0x1  // registers a gathering with the server
-	TerminateGathering = 0x2  // ends a gathering
-	UpdateGathering    = 0x4  // updates a gathering
-	Participate        = 0xB  // unsure on this one, going off NintendoClients wiki for the name
-	Unparticipate      = 0xC  // unsure on this one, going off NintendoClients wiki for the name
-	LaunchSession      = 0x1A // unsure on this one, going off NintendoClients wiki for the name
-	SetState           = 0x1E // sets the state of a gathering
-	Invite             = 0x15 // Accept invite
+	RegisterGathering   = 0x1  // registers a gathering with the server
+	TerminateGathering  = 0x2  // ends a gathering
+	UpdateGathering     = 0x4  // updates a gathering
+	Participate         = 0xB  // used to denote that a player is in a particular session
+	CancelParticipation = 0xC  // used to denote that a player is no longer in a particular session
+	FindBySingleID      = 0x15 // looks up a gathering by its ID
+	LaunchSession       = 0x1A // "launches" the session and makes it officially active
+	SetState            = 0x1E // sets the state of a gathering (in song, etc.)
 )
 
 // JsonProtocol handles the Json requests
 type MatchmakingProtocol struct {
-	server                    *nex.Server
-	ConnectionIDCounter       *nex.Counter
-	RegisterGatheringHandler  func(err error, client *nex.Client, callID uint32, gathering []byte)
-	UpdateGatheringHandler    func(err error, client *nex.Client, callID uint32, gathering []byte, gatheringID uint32)
-	ParticipateHandler        func(err error, client *nex.Client, callID uint32, gatheringID uint32)
-	UnparticipateHandler      func(err error, client *nex.Client, callID uint32, gatheringID uint32)
-	LaunchSessionHandler      func(err error, client *nex.Client, callID uint32, gatheringID uint32)
-	TerminateGatheringHandler func(err error, client *nex.Client, callID uint32, gatheringID uint32)
-	SetStateHandler           func(err error, client *nex.Client, callID uint32, gatheringID uint32, state uint32)
-	InviteHandler             func(err error, client *nex.Client, callID uint32, gatheringID uint32)
+	server                     *nex.Server
+	ConnectionIDCounter        *nex.Counter
+	RegisterGatheringHandler   func(err error, client *nex.Client, callID uint32, gathering []byte)
+	UpdateGatheringHandler     func(err error, client *nex.Client, callID uint32, gathering []byte, gatheringID uint32)
+	ParticipateHandler         func(err error, client *nex.Client, callID uint32, gatheringID uint32)
+	CancelParticipationHandler func(err error, client *nex.Client, callID uint32, gatheringID uint32)
+	LaunchSessionHandler       func(err error, client *nex.Client, callID uint32, gatheringID uint32)
+	TerminateGatheringHandler  func(err error, client *nex.Client, callID uint32, gatheringID uint32)
+	SetStateHandler            func(err error, client *nex.Client, callID uint32, gatheringID uint32, state uint32)
+	FindBySingleIDHandler      func(err error, client *nex.Client, callID uint32, gatheringID uint32)
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) Setup() {
@@ -47,16 +47,16 @@ func (matchmakingProtocol *MatchmakingProtocol) Setup() {
 				go matchmakingProtocol.handleUpdateGathering(packet)
 			case Participate:
 				go matchmakingProtocol.handleParticipate(packet)
-			case Unparticipate:
-				go matchmakingProtocol.handleUnparticipate(packet)
+			case CancelParticipation:
+				go matchmakingProtocol.handleCancelParticipation(packet)
 			case LaunchSession:
 				go matchmakingProtocol.handleLaunchSession(packet)
 			case TerminateGathering:
 				go matchmakingProtocol.handleTerminateGathering(packet)
 			case SetState:
 				go matchmakingProtocol.handleSetState(packet)
-			case Invite:
-				go matchmakingProtocol.handleInvite(packet)
+			case FindBySingleID:
+				go matchmakingProtocol.handleFindBySingleID(packet)
 			default:
 				log.Printf("Unsupported Matchmaking method ID: %#v\n", request.MethodID())
 			}
@@ -76,8 +76,8 @@ func (matchmakingProtocol *MatchmakingProtocol) Participate(handler func(err err
 	matchmakingProtocol.ParticipateHandler = handler
 }
 
-func (matchmakingProtocol *MatchmakingProtocol) Unparticipate(handler func(err error, client *nex.Client, callID uint32, gatheringID uint32)) {
-	matchmakingProtocol.UnparticipateHandler = handler
+func (matchmakingProtocol *MatchmakingProtocol) CancelParticipation(handler func(err error, client *nex.Client, callID uint32, gatheringID uint32)) {
+	matchmakingProtocol.CancelParticipationHandler = handler
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) LaunchSession(handler func(err error, client *nex.Client, callID uint32, gatheringID uint32)) {
@@ -92,8 +92,8 @@ func (matchmakingProtocol *MatchmakingProtocol) SetState(handler func(err error,
 	matchmakingProtocol.SetStateHandler = handler
 }
 
-func (matchmakingProtocol *MatchmakingProtocol) Invite(handler func(err error, client *nex.Client, callID uint32, gatheringID uint32)) {
-	matchmakingProtocol.InviteHandler = handler
+func (matchmakingProtocol *MatchmakingProtocol) FindBySingleID(handler func(err error, client *nex.Client, callID uint32, gatheringID uint32)) {
+	matchmakingProtocol.FindBySingleIDHandler = handler
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) handleRegisterGathering(packet nex.PacketInterface) {
@@ -176,9 +176,9 @@ func (matchmakingProtocol *MatchmakingProtocol) handleParticipate(packet nex.Pac
 	go matchmakingProtocol.ParticipateHandler(nil, client, callID, gatheringID)
 }
 
-func (matchmakingProtocol *MatchmakingProtocol) handleUnparticipate(packet nex.PacketInterface) {
+func (matchmakingProtocol *MatchmakingProtocol) handleCancelParticipation(packet nex.PacketInterface) {
 	if matchmakingProtocol.RegisterGatheringHandler == nil {
-		log.Println("[Warning] MatchmakingProtocol::Unparticipate not implemented")
+		log.Println("[Warning] MatchmakingProtocol::CancelParticipation not implemented")
 		go respondNotImplemented(packet, SecureProtocolID)
 		return
 	}
@@ -193,7 +193,7 @@ func (matchmakingProtocol *MatchmakingProtocol) handleUnparticipate(packet nex.P
 
 	gatheringID := parametersStream.ReadUInt32LE()
 
-	go matchmakingProtocol.UnparticipateHandler(nil, client, callID, gatheringID)
+	go matchmakingProtocol.CancelParticipationHandler(nil, client, callID, gatheringID)
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) handleLaunchSession(packet nex.PacketInterface) {
@@ -258,9 +258,9 @@ func (matchmakingProtocol *MatchmakingProtocol) handleSetState(packet nex.Packet
 
 }
 
-func (matchmakingProtocol *MatchmakingProtocol) handleInvite(packet nex.PacketInterface) {
+func (matchmakingProtocol *MatchmakingProtocol) handleFindBySingleID(packet nex.PacketInterface) {
 	if matchmakingProtocol.RegisterGatheringHandler == nil {
-		log.Println("[Warning] MatchmakingProtocol::Invites not implemented")
+		log.Println("[Warning] MatchmakingProtocol::FindBySingleIDs not implemented")
 		go respondNotImplemented(packet, MatchmakingProtocolID)
 		return
 	}
@@ -275,7 +275,7 @@ func (matchmakingProtocol *MatchmakingProtocol) handleInvite(packet nex.PacketIn
 
 	gatheringID := parametersStream.ReadUInt32LE()
 
-	go matchmakingProtocol.InviteHandler(nil, client, callID, gatheringID)
+	go matchmakingProtocol.FindBySingleIDHandler(nil, client, callID, gatheringID)
 }
 
 // NewMatchmakingProtocol returns a new MatchmakingProtocol
