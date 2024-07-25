@@ -10,14 +10,15 @@ import (
 const (
 	// AccountManagementProtocolID is the protocol ID for the Account Management protocol
 	AccountManagementProtocolID = 0x19
-
-	SetStatus             = 0x11
-	NintendoCreateAccount = 0x1B // also used by Xbox 360 when multiple profiles are signed in
+	DeleteAccount               = 0x02
+	SetStatus                   = 0x11
+	NintendoCreateAccount       = 0x1B // also used by Xbox 360 when multiple profiles are signed in
 )
 
 // AccountManagementProtocol handles the Account Management nex protocol
 type AccountManagementProtocol struct {
 	server                       *nex.Server
+	DeleteAccountHandler         func(err error, client *nex.Client, callID uint32, pid uint32)
 	NintendoCreateAccountHandler func(err error, client *nex.Client, callID uint32, username string, key string, groups uint32, email string)
 	SetStatusHandler             func(err error, client *nex.Client, callID uint32, status string)
 }
@@ -31,6 +32,8 @@ func (accountManagementProtocol *AccountManagementProtocol) Setup() {
 
 		if AccountManagementProtocolID == request.ProtocolID() {
 			switch request.MethodID() {
+			case DeleteAccount:
+				go accountManagementProtocol.handleDeleteAccount(packet)
 			case NintendoCreateAccount:
 				go accountManagementProtocol.handleNintendoCreateAccount(packet)
 			case SetStatus:
@@ -42,6 +45,11 @@ func (accountManagementProtocol *AccountManagementProtocol) Setup() {
 	})
 }
 
+// DeleteAccount sets the DeleteAccount handler function
+func (accountManagementProtocol *AccountManagementProtocol) DeleteAccount(handler func(err error, client *nex.Client, callID uint32, pid uint32)) {
+	accountManagementProtocol.DeleteAccountHandler = handler
+}
+
 // NintendoCreateAccount sets the NintendoCreateAccount handler function
 func (accountManagementProtocol *AccountManagementProtocol) NintendoCreateAccount(handler func(err error, client *nex.Client, callID uint32, username string, key string, groups uint32, email string)) {
 	accountManagementProtocol.NintendoCreateAccountHandler = handler
@@ -50,6 +58,30 @@ func (accountManagementProtocol *AccountManagementProtocol) NintendoCreateAccoun
 // SetStatus sets the SetStatus handler function
 func (accountManagementProtocol *AccountManagementProtocol) SetStatus(handler func(err error, client *nex.Client, callID uint32, status string)) {
 	accountManagementProtocol.SetStatusHandler = handler
+}
+
+func (accountManagementProtocol *AccountManagementProtocol) handleDeleteAccount(packet nex.PacketInterface) {
+	if accountManagementProtocol.DeleteAccountHandler == nil {
+		log.Println("[Warning] AccountManagementProtocol::DeleteAccount not implemented")
+		go respondNotImplemented(packet, AccountManagementProtocolID)
+		return
+	}
+
+	client := packet.Sender()
+	request := packet.RMCRequest()
+
+	callID := request.CallID()
+	parameters := request.Parameters()
+
+	parametersStream := nex.NewStreamIn(parameters, accountManagementProtocol.server)
+
+	pid, err := parametersStream.ReadUInt32LE()
+	if err != nil {
+		go accountManagementProtocol.DeleteAccountHandler(err, client, callID, 0)
+		return
+	}
+
+	go accountManagementProtocol.DeleteAccountHandler(nil, client, callID, pid)
 }
 
 func (accountManagementProtocol *AccountManagementProtocol) handleNintendoCreateAccount(packet nex.PacketInterface) {
