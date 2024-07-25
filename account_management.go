@@ -75,11 +75,7 @@ func (accountManagementProtocol *AccountManagementProtocol) handleDeleteAccount(
 
 	parametersStream := nex.NewStreamIn(parameters, accountManagementProtocol.server)
 
-	pid, err := parametersStream.ReadUInt32LE()
-	if err != nil {
-		go accountManagementProtocol.DeleteAccountHandler(err, client, callID, 0)
-		return
-	}
+	pid := parametersStream.ReadUInt32LE()
 
 	go accountManagementProtocol.DeleteAccountHandler(nil, client, callID, pid)
 }
