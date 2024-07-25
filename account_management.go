@@ -12,6 +12,7 @@ const (
 	AccountManagementProtocolID = 0x19
 	DeleteAccount               = 0x02
 	SetStatus                   = 0x11
+	FindByNameLike              = 0x19
 	NintendoCreateAccount       = 0x1B // also used by Xbox 360 when multiple profiles are signed in
 )
 
@@ -21,6 +22,7 @@ type AccountManagementProtocol struct {
 	DeleteAccountHandler         func(err error, client *nex.Client, callID uint32, pid uint32)
 	NintendoCreateAccountHandler func(err error, client *nex.Client, callID uint32, username string, key string, groups uint32, email string)
 	SetStatusHandler             func(err error, client *nex.Client, callID uint32, status string)
+	FindByNameLikeHandler        func(err error, client *nex.Client, callID uint32, uiGroups uint32, name string)
 }
 
 // Setup initializes the protocol
@@ -38,6 +40,8 @@ func (accountManagementProtocol *AccountManagementProtocol) Setup() {
 				go accountManagementProtocol.handleNintendoCreateAccount(packet)
 			case SetStatus:
 				go accountManagementProtocol.handleSetStatus(packet)
+			case FindByNameLike:
+				go accountManagementProtocol.handleFindByNameLike(packet)
 			default:
 				log.Printf("Unsupported AccountManagement method ID: %#v\n", request.MethodID())
 			}
@@ -58,6 +62,11 @@ func (accountManagementProtocol *AccountManagementProtocol) NintendoCreateAccoun
 // SetStatus sets the SetStatus handler function
 func (accountManagementProtocol *AccountManagementProtocol) SetStatus(handler func(err error, client *nex.Client, callID uint32, status string)) {
 	accountManagementProtocol.SetStatusHandler = handler
+}
+
+// FindByNameLike sets the FindByNameLike handler function
+func (accountManagementProtocol *AccountManagementProtocol) FindByNameLike(handler func(err error, client *nex.Client, callID uint32, uiGroups uint32, name string)) {
+	accountManagementProtocol.FindByNameLikeHandler = handler
 }
 
 func (accountManagementProtocol *AccountManagementProtocol) handleDeleteAccount(packet nex.PacketInterface) {
@@ -151,6 +160,31 @@ func (accountManagementProtocol *AccountManagementProtocol) handleSetStatus(pack
 	}
 
 	go accountManagementProtocol.SetStatusHandler(nil, client, callID, status)
+}
+
+func (accountManagementProtocol *AccountManagementProtocol) handleFindByNameLike(packet nex.PacketInterface) {
+	if accountManagementProtocol.FindByNameLikeHandler == nil {
+		log.Println("[Warning] AccountManagementProtocol::FindByNameLike not implemented")
+		go respondNotImplemented(packet, AccountManagementProtocolID)
+		return
+	}
+
+	client := packet.Sender()
+	request := packet.RMCRequest()
+
+	callID := request.CallID()
+	parameters := request.Parameters()
+
+	parametersStream := nex.NewStreamIn(parameters, accountManagementProtocol.server)
+
+	uiGroups := parametersStream.ReadUInt32LE()
+	name, err := parametersStream.Read4ByteString()
+	if err != nil {
+		go accountManagementProtocol.FindByNameLikeHandler(err, client, callID, 0, "")
+		return
+	}
+
+	go accountManagementProtocol.FindByNameLikeHandler(nil, client, callID, uiGroups, name)
 }
 
 // NewAccountManagementProtocol returns a new AccountManagementProtocol
