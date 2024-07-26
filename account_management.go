@@ -130,7 +130,7 @@ func (accountManagementProtocol *AccountManagementProtocol) handleCreateAccount(
 	}
 
 	// I don't think PS3 can ever call this method, but just in case
-	if dataHolderName != "NintendoToken" || dataHolderName != "XboxUserInfo" || dataHolderName != "SonyNPTicket" {
+	if dataHolderName != "NintendoToken" && dataHolderName != "XboxUserInfo" && dataHolderName != "SonyNPTicket" {
 		err := errors.New("[AccountManagementProtocol::CreateAccount] Data holder name does not match")
 		go accountManagementProtocol.CreateAccountHandler(err, client, callID, "", "", 0, "")
 		return
