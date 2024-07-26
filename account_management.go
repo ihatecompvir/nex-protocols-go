@@ -13,16 +13,16 @@ const (
 	DeleteAccount               = 0x02
 	SetStatus                   = 0x11
 	FindByNameLike              = 0x19
-	NintendoCreateAccount       = 0x1B // also used by Xbox 360 when multiple profiles are signed in
+	CreateAccount               = 0x1B // also used by Xbox 360 when multiple profiles are signed in
 )
 
 // AccountManagementProtocol handles the Account Management nex protocol
 type AccountManagementProtocol struct {
-	server                       *nex.Server
-	DeleteAccountHandler         func(err error, client *nex.Client, callID uint32, pid uint32)
-	NintendoCreateAccountHandler func(err error, client *nex.Client, callID uint32, username string, key string, groups uint32, email string)
-	SetStatusHandler             func(err error, client *nex.Client, callID uint32, status string)
-	FindByNameLikeHandler        func(err error, client *nex.Client, callID uint32, uiGroups uint32, name string)
+	server                *nex.Server
+	DeleteAccountHandler  func(err error, client *nex.Client, callID uint32, pid uint32)
+	CreateAccountHandler  func(err error, client *nex.Client, callID uint32, username string, key string, groups uint32, email string)
+	SetStatusHandler      func(err error, client *nex.Client, callID uint32, status string)
+	FindByNameLikeHandler func(err error, client *nex.Client, callID uint32, uiGroups uint32, name string)
 }
 
 // Setup initializes the protocol
@@ -36,8 +36,8 @@ func (accountManagementProtocol *AccountManagementProtocol) Setup() {
 			switch request.MethodID() {
 			case DeleteAccount:
 				go accountManagementProtocol.handleDeleteAccount(packet)
-			case NintendoCreateAccount:
-				go accountManagementProtocol.handleNintendoCreateAccount(packet)
+			case CreateAccount:
+				go accountManagementProtocol.handleCreateAccount(packet)
 			case SetStatus:
 				go accountManagementProtocol.handleSetStatus(packet)
 			case FindByNameLike:
@@ -54,9 +54,9 @@ func (accountManagementProtocol *AccountManagementProtocol) DeleteAccount(handle
 	accountManagementProtocol.DeleteAccountHandler = handler
 }
 
-// NintendoCreateAccount sets the NintendoCreateAccount handler function
-func (accountManagementProtocol *AccountManagementProtocol) NintendoCreateAccount(handler func(err error, client *nex.Client, callID uint32, username string, key string, groups uint32, email string)) {
-	accountManagementProtocol.NintendoCreateAccountHandler = handler
+// CreateAccount sets the CreateAccount handler function
+func (accountManagementProtocol *AccountManagementProtocol) CreateAccount(handler func(err error, client *nex.Client, callID uint32, username string, key string, groups uint32, email string)) {
+	accountManagementProtocol.CreateAccountHandler = handler
 }
 
 // SetStatus sets the SetStatus handler function
@@ -89,9 +89,9 @@ func (accountManagementProtocol *AccountManagementProtocol) handleDeleteAccount(
 	go accountManagementProtocol.DeleteAccountHandler(nil, client, callID, pid)
 }
 
-func (accountManagementProtocol *AccountManagementProtocol) handleNintendoCreateAccount(packet nex.PacketInterface) {
-	if accountManagementProtocol.NintendoCreateAccountHandler == nil {
-		log.Println("[Warning] AccountManagementProtocol::NintendoCreateAccount not implemented")
+func (accountManagementProtocol *AccountManagementProtocol) handleCreateAccount(packet nex.PacketInterface) {
+	if accountManagementProtocol.CreateAccountHandler == nil {
+		log.Println("[Warning] AccountManagementProtocol::CreateAccount not implemented")
 		go respondNotImplemented(packet, AccountManagementProtocolID)
 		return
 	}
@@ -106,40 +106,41 @@ func (accountManagementProtocol *AccountManagementProtocol) handleNintendoCreate
 
 	username, err := parametersStream.Read4ByteString()
 	if err != nil {
-		go accountManagementProtocol.NintendoCreateAccountHandler(err, client, callID, "", "", 0, "")
+		go accountManagementProtocol.CreateAccountHandler(err, client, callID, "", "", 0, "")
 		return
 	}
 
 	key, err := parametersStream.Read4ByteString()
 	if err != nil {
-		go accountManagementProtocol.NintendoCreateAccountHandler(err, client, callID, "", "", 0, "")
+		go accountManagementProtocol.CreateAccountHandler(err, client, callID, "", "", 0, "")
 		return
 	}
 
 	groups := parametersStream.ReadUInt32LE()
 	email, err := parametersStream.Read4ByteString()
 	if err != nil {
-		go accountManagementProtocol.NintendoCreateAccountHandler(err, client, callID, "", "", 0, "")
+		go accountManagementProtocol.CreateAccountHandler(err, client, callID, "", "", 0, "")
 		return
 	}
 
 	dataHolderName, err := parametersStream.Read4ByteString()
 	if err != nil {
-		go accountManagementProtocol.NintendoCreateAccountHandler(err, client, callID, "", "", 0, "")
+		go accountManagementProtocol.CreateAccountHandler(err, client, callID, "", "", 0, "")
 		return
 	}
 
-	if dataHolderName != "NintendoToken" {
-		err := errors.New("[AccountManagementProtocol::NintendoCreateAccount] Data holder name does not match")
-		go accountManagementProtocol.NintendoCreateAccountHandler(err, client, callID, "", "", 0, "")
+	// I don't think PS3 can ever call this method, but just in case
+	if dataHolderName != "NintendoToken" || dataHolderName != "XboxUserInfo" || dataHolderName != "SonyNPTicket" {
+		err := errors.New("[AccountManagementProtocol::CreateAccount] Data holder name does not match")
+		go accountManagementProtocol.CreateAccountHandler(err, client, callID, "", "", 0, "")
 		return
 	}
 
-	go accountManagementProtocol.NintendoCreateAccountHandler(nil, client, callID, username, key, groups, email)
+	go accountManagementProtocol.CreateAccountHandler(nil, client, callID, username, key, groups, email)
 }
 
 func (accountManagementProtocol *AccountManagementProtocol) handleSetStatus(packet nex.PacketInterface) {
-	if accountManagementProtocol.NintendoCreateAccountHandler == nil {
+	if accountManagementProtocol.CreateAccountHandler == nil {
 		log.Println("[Warning] AccountManagementProtocol::SetStatus not implemented")
 		go respondNotImplemented(packet, AccountManagementProtocolID)
 		return
