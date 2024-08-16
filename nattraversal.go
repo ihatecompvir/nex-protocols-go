@@ -44,7 +44,7 @@ func (natTraversalProtocol *NATTraversalProtocol) RequestProbeInitiation(handler
 func (natTraversalProtocol *NATTraversalProtocol) handleRequestProbeInitiation(packet nex.PacketInterface) {
 	if natTraversalProtocol.RequestProbeInitiationHandler == nil {
 		log.Println("[Warning] NATTraversal::RequestProbeInitiation not implemented")
-		go respondNotImplemented(packet, SecureProtocolID)
+		go respondNotImplemented(packet, NATTraversalProtocolID)
 		return
 	}
 

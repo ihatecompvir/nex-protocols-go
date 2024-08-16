@@ -43,7 +43,7 @@ func (customMatchmakingProtocol *CustomMatchmakingProtocol) CustomFind(handler f
 func (customMatchmakingProtocol *CustomMatchmakingProtocol) handleCustomFind(packet nex.PacketInterface) {
 	if customMatchmakingProtocol.CustomFindHandler == nil {
 		log.Println("[Warning] CustomMatchmakingProtocol::CustomFind not implemented")
-		go respondNotImplemented(packet, SecureProtocolID)
+		go respondNotImplemented(packet, CustomMatchmakingProtocolID)
 		return
 	}
 

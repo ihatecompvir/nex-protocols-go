@@ -55,7 +55,7 @@ func (jsonProtocol *JsonProtocol) JSONRequest2(handler func(err error, client *n
 func (jsonProtocol *JsonProtocol) handleRequest(packet nex.PacketInterface) {
 	if jsonProtocol.JSONRequestHandler == nil {
 		log.Println("[Warning] JsonProtocol::JSONRequest not implemented")
-		go respondNotImplemented(packet, SecureProtocolID)
+		go respondNotImplemented(packet, JsonProtocolID)
 		return
 	}
 
@@ -86,7 +86,7 @@ func (jsonProtocol *JsonProtocol) handleRequest(packet nex.PacketInterface) {
 func (jsonProtocol *JsonProtocol) handleRequest2(packet nex.PacketInterface) {
 	if jsonProtocol.JSONRequestHandler == nil {
 		log.Println("[Warning] JsonProtocol::JSONRequest2 not implemented")
-		go respondNotImplemented(packet, SecureProtocolID)
+		go respondNotImplemented(packet, JsonProtocolID)
 		return
 	}
 
