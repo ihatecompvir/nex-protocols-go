@@ -10,25 +10,7 @@ type StreamIn struct {
 	*nex.StreamIn
 }
 
-// ReadListPersistentNotification reads a list of PersistentNotification structures
-func (stream *StreamIn) ReadListPersistentNotification() ([]*PersistentNotification, error) {
-	length := stream.ReadUInt32LE()
-	persistentNotifications := make([]*PersistentNotification, 0)
-
-	for i := 0; i < int(length); i++ {
-		persistentNotificationStructureInterface, err := stream.ReadStructure(NewPersistentNotification())
-		if err != nil {
-			return nil, err
-		}
-
-		persistentNotification := persistentNotificationStructureInterface.(*PersistentNotification)
-		persistentNotifications = append(persistentNotifications, persistentNotification)
-	}
-
-	return persistentNotifications, nil
-}
-
-// ReadListStationURL reads a list of PersistentNotification structures
+// ReadListStationURL reads a list of StationURL structures
 func (stream *StreamIn) ReadListStationURL() ([]*nex.StationURL, error) {
 	length := stream.ReadUInt32LE()
 	stationUrls := make([]*nex.StationURL, 0)
