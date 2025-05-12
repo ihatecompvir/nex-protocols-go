@@ -81,7 +81,7 @@ func (nintendoManagementProtocol *NintendoManagementProtocol) handleGetConsoleUs
 		friendCode[i] = parametersStream.ReadUInt8()
 	}
 
-	finalFriendCode := fmt.Sprintf("%d", bytesToUint64(reverseBytes(friendCode)))
+	finalFriendCode := fmt.Sprintf("%d", bytesToUint64(friendCode))
 
 	go nintendoManagementProtocol.GetConsoleUsernamesHandler(nil, client, callID, finalFriendCode)
 }

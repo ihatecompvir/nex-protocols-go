@@ -12,6 +12,7 @@ const (
 	AccountManagementProtocolID = 0x19
 	DeleteAccount               = 0x02
 	SetStatus                   = 0x11
+	GetStatus                   = 0x12
 	FindByNameLike              = 0x19
 	LookupOrCreateAccount       = 0x1B // also used by Xbox 360 when multiple profiles are signed in
 )
@@ -22,6 +23,7 @@ type AccountManagementProtocol struct {
 	DeleteAccountHandler         func(err error, client *nex.Client, callID uint32, pid uint32)
 	LookupOrCreateAccountHandler func(err error, client *nex.Client, callID uint32, username string, key string, groups uint32, email string)
 	SetStatusHandler             func(err error, client *nex.Client, callID uint32, status string)
+	GetStatusHandler             func(err error, client *nex.Client, callID uint32, pid uint32)
 	FindByNameLikeHandler        func(err error, client *nex.Client, callID uint32, uiGroups uint32, name string)
 }
 
@@ -40,6 +42,8 @@ func (accountManagementProtocol *AccountManagementProtocol) Setup() {
 				go accountManagementProtocol.handleLookupOrCreateAccount(packet)
 			case SetStatus:
 				go accountManagementProtocol.handleSetStatus(packet)
+			case GetStatus:
+				go accountManagementProtocol.handleGetStatus(packet)
 			case FindByNameLike:
 				go accountManagementProtocol.handleFindByNameLike(packet)
 			default:
@@ -62,6 +66,11 @@ func (accountManagementProtocol *AccountManagementProtocol) LookupOrCreateAccoun
 // SetStatus sets the SetStatus handler function
 func (accountManagementProtocol *AccountManagementProtocol) SetStatus(handler func(err error, client *nex.Client, callID uint32, status string)) {
 	accountManagementProtocol.SetStatusHandler = handler
+}
+
+// GetStatus sets the GetStatus handler function
+func (accountManagementProtocol *AccountManagementProtocol) GetStatus(handler func(err error, client *nex.Client, callID uint32, pid uint32)) {
+	accountManagementProtocol.GetStatusHandler = handler
 }
 
 // FindByNameLike sets the FindByNameLike handler function
@@ -161,6 +170,26 @@ func (accountManagementProtocol *AccountManagementProtocol) handleSetStatus(pack
 	}
 
 	go accountManagementProtocol.SetStatusHandler(nil, client, callID, status)
+}
+
+func (accountManagementProtocol *AccountManagementProtocol) handleGetStatus(packet nex.PacketInterface) {
+	if accountManagementProtocol.SetStatusHandler == nil {
+		log.Println("[Warning] AccountManagementProtocol::GetStatus not implemented")
+		go respondNotImplemented(packet, AccountManagementProtocolID)
+		return
+	}
+
+	client := packet.Sender()
+	request := packet.RMCRequest()
+
+	callID := request.CallID()
+	parameters := request.Parameters()
+
+	parametersStream := nex.NewStreamIn(parameters, accountManagementProtocol.server)
+
+	pid := parametersStream.ReadUInt32LE()
+
+	go accountManagementProtocol.GetStatusHandler(nil, client, callID, pid)
 }
 
 func (accountManagementProtocol *AccountManagementProtocol) handleFindByNameLike(packet nex.PacketInterface) {
