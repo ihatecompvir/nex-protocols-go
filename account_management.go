@@ -173,7 +173,7 @@ func (accountManagementProtocol *AccountManagementProtocol) handleSetStatus(pack
 }
 
 func (accountManagementProtocol *AccountManagementProtocol) handleGetStatus(packet nex.PacketInterface) {
-	if accountManagementProtocol.SetStatusHandler == nil {
+	if accountManagementProtocol.GetStatusHandler == nil {
 		log.Println("[Warning] AccountManagementProtocol::GetStatus not implemented")
 		go respondNotImplemented(packet, AccountManagementProtocolID)
 		return
